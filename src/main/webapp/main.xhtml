@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+<f:view>
+    <h:head>
+        <link rel="stylesheet" href="./resources/css/main.css"/>
+        <h:outputScript library="js" name="updateRadius.js" target="head"/>
+        <h:outputScript library="js" name="clickHandler.js" target="head"/>
+        <h:outputScript library="js" name="validator.js" target="head"/>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.js"></script>
+        <title>web lab №3</title>
+    </h:head>
+    <h:body>
+        <div id="redirect">
+            <h:form>
+                <h:commandButton styleClass="redir" action="toIndexPage" value="Назад"/>
+            </h:form>
+        </div>
+        <div class="leftside">
+            <h:form>
+                <div id="xContainer" class="input-container">
+                <h:outputLabel>
+                    X:
+                    <h:inputText styleClass="xMenu"   a:placeholder="от -5 до 5"/>
+                </h:outputLabel>
+                <h:inputText id="xMenu" styleClass="xMenu" value="${areaCheckBean.x}" style="display:none;"/>
+            </div>
+           <div id="yContainer" class="input-container">
+            <h:outputLabel>
+                Y:
+                <h:selectOneMenu styleClass="yInput">
+                    <f:selectItem itemValue="3" itemLabel="3" />
+                    <f:selectItem itemValue="2" itemLabel="2" />
+                    <f:selectItem itemValue="1" itemLabel="1" />
+                    <f:selectItem itemValue="0" itemLabel="0" />
+                    <f:selectItem itemValue="-1" itemLabel="-1" />
+                    <f:selectItem itemValue="-2" itemLabel="-2" />
+                    <f:selectItem itemValue="-3" itemLabel="-3" />
+                    <f:selectItem itemValue="-4" itemLabel="-4" />
+                    <f:selectItem itemValue="-5" itemLabel="-5" />
+                </h:selectOneMenu>
+            </h:outputLabel>
+            <h:inputText id="yInput" styleClass="yInput" value="${areaCheckBean.y}" a:hidden="true"/>
+        </div>
+                <div id="rContainer" class="input-container">
+                    <h:outputLabel>
+                        R:
+                        <h:inputText styleClass="rMenu"  a:placeholder="от 2 до 5" onchange="updateRadius(event)"/>
+                    </h:outputLabel>
+                    <h:inputText id="rMenu" styleClass="rMenu" value="${areaCheckBean.r}" style="display:none;"/>
+                </div>
+
+                <input type="button" class="submitButton" value="Проверить" onclick="handleForm()"/>
+                <h:commandButton styleClass="mainSubmitButton" value="Проверить" style="display:none;">
+                    <f:ajax execute="xMenu yInput rMenu" listener="${areaCheckBean.submit()}" render="response_table rContainer yContainer xContainer imageContainer"/>
+                </h:commandButton>
+
+                <h:commandButton type="submit" styleClass="CleanButton" value="Очистить" action="#{areaCheckBean.cleaner()}">
+                    <f:ajax render="response_table imageContainer" />
+                </h:commandButton>
+            </h:form>
+
+
+            <h:dataTable id="response_table" value = "#{areaCheckBean.reversedHistory}" var ="response">
+
+                <h:column>
+                    <f:facet name = "header">Результат</f:facet>
+                    #{response.result}
+                </h:column>
+
+                <h:column>
+                    <f:facet name = "header">X</f:facet>
+                    #{response.x}
+                </h:column>
+
+                <h:column>
+                    <f:facet name = "header">Y</f:facet>
+                    #{response.y}
+                </h:column>
+
+                <h:column>
+                    <f:facet name = "header">R</f:facet>
+                    #{response.r}
+                </h:column>
+
+                <h:column>
+                    <f:facet name = "header">Время</f:facet>
+                    #{response.currentTime}
+                </h:column>
+
+                <h:column>
+                    <f:facet name = "header">Выполнение выполнения</f:facet>
+                    #{response.executionTime}
+                </h:column>
+            </h:dataTable>
+        </div>
+        <h:panelGroup id="imageContainer">
+            <div class="rightside">
+                <svg
+                        id="graphic"
+                        width="300"
+                        height="300"
+                        onclick="checkHit(event)"
+                >
+                    <line
+                            x1="0"
+                            x2="100%"
+                            y1="50%"
+                            y2="50%"
+                            stroke="aliceblue"
+                            stroke-width="2"
+                    />
+                    <line
+                            x1="97%"
+                            x2="100%"
+                            y1="47%"
+                            y2="50%"
+                            stroke="aliceblue"
+                            stroke-width="2"
+                    />
+                    <line
+                            x1="97%"
+                            x2="100%"
+                            y1="53%"
+                            y2="50%"
+                            stroke="aliceblue"
+                            stroke-width="2"
+                    />
+
+                    <line
+                            x1="50%"
+                            x2="50%"
+                            y1="0"
+                            y2="100%"
+                            stroke="aliceblue"
+                            stroke-width="2"
+                    />
+                    <line
+                            x1="47%"
+                            x2="50%"
+                            y1="3%"
+                            y2="0"
+                            stroke="aliceblue"
+                            stroke-width="2"
+                    />
+                    <line
+                            x1="53%"
+                            x2="50%"
+                            y1="3%"
+                            y2="0"
+                            stroke="aliceblue"
+                            stroke-width="2"
+                    />
+                    <c:forEach begin="30" end="270" step="30" varStatus="loop">
+                        <line
+                                x1="#{loop.count * 30 }"
+                                x2="#{loop.count * 30  }"
+                                y1="49%"
+                                y2="51%"
+                                stroke="aliceblue"
+                                stroke-width="1"
+                        />
+
+                        <line
+                                x1="49%"
+                                x2="51%"
+                                y1="#{loop.count * 30}"
+                                y2="#{loop.count * 30}"
+                                stroke="aliceblue"
+                                stroke-width="1"
+                        />
+                    </c:forEach>
+                    <path
+                            d="
+                              M #{150 + areaCheckBean.r * 15 } 150
+                              L #{150 + areaCheckBean.r * 15 } #{150 + areaCheckBean.r * 30}
+                              L 150 #{150 + areaCheckBean.r * 30}
+                              L 150 #{150 + areaCheckBean.r * 15}
+                              L #{150 - areaCheckBean.r * 30} 150
+                              A #{areaCheckBean.r * 30} #{areaCheckBean.r * 30} 0 0 1 150 #{150 - areaCheckBean.r * 30}
+                              L 150 150
+                              L #{150 + areaCheckBean.r * 30 } 150
+                              "
+
+
+
+                            stroke="aliceblue"
+                            stroke-width="2"
+                            fill="#9a3ce7"
+                            fill-opacity="0.5"
+                            id="graph-path"
+                    />
+                    <ui:repeat value="#{areaCheckBean.history}" var="point">
+                        <circle cx="#{point.x*30 + 150}" cy="#{150 - point.y*30}" r="5" fill='#{point.result ? "#00FF00" : "#FF0000"}'/>
+                    </ui:repeat>
+                </svg>
+            </div>
+        </h:panelGroup>
+    </h:body>
+</f:view>
+</html>
